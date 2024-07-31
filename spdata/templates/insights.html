@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Data Insights (Last Streamed: {{ insights.last_streamed_date }})</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .highlight {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .stat-label {
+            font-size: 1rem;
+        }
+        .stat-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="mb-4">Spotify Data Insights</h1>
+                <p class="text-muted">Last Streamed: {{ insights.last_streamed_date }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="stat-header">Top Artists</h2>
+                        <ul class="list-group">
+                            {% for artist in insights.top_artists %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ artist.name }}
+                                    <span class="badge bg-primary rounded-pill">{{ artist.count }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="stat-header">Top Songs</h2>
+                        <ul class="list-group">
+                            {% for song in insights.top_songs %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ song.name }}
+                                    <span class="badge bg-primary rounded-pill">{{ song.count }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <p class="stat-label">Total Listening Time</p>
+                        <p class="card-text highlight">{{ (insights.total_listening_time / 1000 / 60) | round(2) }} minutes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <p class="stat-label">Average Listening Time per Day</p>
+                        <p class="card-text highlight">{{ (insights.average_listening_time_per_day / 1000 / 60) | round(2) }} minutes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <p class="stat-label">Most Listened Day</p>
+                        <p class="card-text highlight">{{ insights.most_listened_day.date }} with {{ (insights.most_listened_day.ms_played / 1000 / 60) | round(2) }} minutes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <form action="/customize" method="post">
+                    <input type="hidden" name="insights" value='{{ insights | tojson }}'>
+                    <button type="submit" class="btn btn-secondary mb-4">Create Shareable Post</button>
+                </form>
+                <a href="/" class="btn btn-secondary">Upload Another File</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

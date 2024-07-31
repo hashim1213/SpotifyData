@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shareable Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .insta-post-container {
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+        .insta-post {
+            width: 1080px;
+            height: 1080px;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .insta-post h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .insta-post h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        .insta-post p, .insta-post li {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .insta-post ol {
+            padding-left: 0;
+            list-style-position: inside;
+        }
+        .insta-post ol li {
+            display: flex;
+            justify-content: space-between;
+            list-style: none;
+            padding: 0 20px;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .content-left, .content-right {
+            flex: 1;
+            text-align: center;
+        }
+        .content-right img {
+            max-width: 100%;
+            height: auto;
+        }
+        @media (min-width: 768px) {
+            .content-wrapper {
+                flex-direction: row;
+            }
+            .content-left {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="mb-4">Shareable Post</h1>
+                <div class="insta-post-container">
+                    <div class="insta-post" id="post" style="background-image: url('{{ background }}'); color: {{ text_color }};">
+                        <h1>Spotify Insights</h1>
+                        <p>As of {{ last_streamed_date }}</p>
+                        <div class="content-wrapper">
+                            <div class="content-left">
+                                {% if 'top_artists' in selected_data %}
+                                    <h2>Top Artists</h2>
+                                    <ol>
+                                        {% for artist in insights.top_artists %}
+                                            <li>
+                                                <span>{{ artist.name }}</span>
+                                                <span>{{ artist.count }} listens</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endif %}
+                                {% if 'top_songs' in selected_data %}
+                                    <h2>Top Songs</h2>
+                                    <ol>
+                                        {% for song in insights.top_songs %}
+                                            <li>
+                                                <span>{{ song.name }}</span>
+                                                <span>{{ song.count }} listens</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endif %}
+                                {% if 'total_listening_time' in selected_data %}
+                                    <p>Total Listening Time: {{ (insights.total_listening_time / 1000 / 60) | round(2) }} minutes</p>
+                                {% endif %}
+                                {% if 'average_listening_time_per_day' in selected_data %}
+                                    <p>Average Listening Time per Day: {{ (insights.average_listening_time_per_day / 1000 / 60) | round(2) }} minutes</p>
+                                {% endif %}
+                                {% if 'most_listened_day' in selected_data %}
+                                    <p>Most Listened Day: {{ insights.most_listened_day.date }} with {{ (insights.most_listened_day.ms_played / 1000 / 60) | round(2) }} minutes</p>
+                                {% endif %}
+                            </div>
+                            {% if pie_chart_url %}
+                                <div class="content-right">
+                                    <h2>Top Artists Distribution</h2>
+                                    <img src="{{ pie_chart_url }}" alt="Pie Chart">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-4" onclick="downloadImage()">Download Post</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function downloadImage() {
+            const post = document.getElementById('post');
+            html2canvas(post, { width: 1080, height: 1080 }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'spotify_post.png';
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
